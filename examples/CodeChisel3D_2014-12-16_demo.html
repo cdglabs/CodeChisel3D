@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>CodeChisel3D 2014-12-16 demo</title>
+    <meta http-equiv="cache-control" content="no-cache" />
+    <meta http-equiv="pragma" content="no-cache" />
+
+  </head>
+  <body style="margin:0;">
+    <!--ui related-->
+    <script type="text/javascript" src="../vendor/dat.gui.js"></script>
+    <script type="text/javascript" src="../vendor/mousetrap.js"></script>
+
+    <!--three-->
+    <script type="text/javascript" src="http://cdnjs.cloudflare.com/ajax/libs/three.js/r69/three.js"></script>
+    <script type="text/javascript" src="../vendor/three/OrbitControls.js"></script>
+    <script type="text/javascript" src="../vendor/three/VRControls.js"></script>
+    <script type="text/javascript" src="../vendor/three/VREffect.js"></script>
+    <script type="text/javascript" src="../vendor/three/TransformControls.js"></script>
+    <script type="text/javascript" src="http://jeromeetienne.github.io/threex.videotexture/threex.videotexture.js"></script>
+    <script type="text/javascript" src="http://jeromeetienne.github.io/threex.videotexture/threex.webcamtexture.js"></script>
+    <script type="text/javascript" src="https://rawgit.com/jeromeetienne/tquery/master/build/tquery.js"></script>
+    <script type="text/javascript" src="../vendor/three-world-with-tquery.dev.js"></script>
+
+    <script type="text/javascript" src="../vendor/three-codeeditor/codeeditor3d.dev.js"></script>
+    <script type="text/javascript" src="../vendor/lively.ast.dev.js"></script>
+    <script type="text/javascript" src="../vendor/lively.vm.dev.js"></script>
+
+
+    <!--lively-2-lively-->
+    <!--<script type="text/javascript" src="http://lively-web.org/users/robertkrahn/node-lively2lively/lively2lively-browserified.js?name=three-codeeditor-simple&baseURL=http://lively-web.org:8080&autoload=true"></script></style>-->
+
+    <!--scene setup-->
+    <script type="text/javascript" >
+      var htmlCode = document.documentElement.innerHTML;
+      var useVR = !!navigator.mozGetVRDevices || !!navigator.getVRDevices;
+      var isMac = navigator.userAgent.indexOf("Mac OS X") > -1;
+      THREE.World.create(document.body, {useOrbitControl: true, useVR: useVR}, function(err, world) {
+
+        world.startLoop();
+        world.renderer.setClearColor(0x333F47, 1);
+        world.camera.position.set(0,200,320);
+        world.camera.far = 100000;
+        world.camera.updateProjectionMatrix();
+
+        // -=-=-=-=-=-=-=-=-=-=-=-=-=-
+        // some geometry to play with
+        // -=-=-=-=-=-=-=-=-=-=-=-=-=-
+
+        var plane = new THREE.Mesh(
+            new THREE.PlaneGeometry(1000,1000, 20,20),
+            new THREE.MeshBasicMaterial({
+              color: 0x00ffff, wireframe: true,
+              side: THREE.DoubleSide}));
+        plane.position.set(plane.position.x/2, 0, plane.position.z/2);
+        plane.rotation.x = Math.PI/2
+        world.scene.add(plane);
+
+
+        // -=-=-=-=-=-=-=-=-=-
+        // events + controls
+        // -=-=-=-=-=-=-=-=-=-
+        var DOMEvents = THREEx.DomEvents;
+        world.events = new DOMEvents(world.camera, world.renderer.domElement);
+        var tQueryWorld = tQueryWorld = setupTQuery(world);
+
+        // -=-=-=-=-=-=-=-=-=-
+        // prepare code editor
+        // -=-=-=-=-=-=-=-=-=-
+
+        var codeEditor = new THREE.CodeEditor({
+          events: world.events,
+          vr: useVR ? world.vr : null
+        });
+        world.scene.add(codeEditor);
+        codeEditor.position.set(0,225,-200)
+
+        codeEditor.aceEditor.commands.addCommands(
+          THREE.CodeEditor.commands.javascript);
+        ace.config.set("basePath", "../vendor/three-codeeditor");
+        ace.config.set("modePath", "../vendor/three-codeeditor");
+
+        codeEditor.aceEditor.setTheme("ace/theme/twilight");
+        // FIXME setKeyboardHandler() is broken, it won't load the right amd module
+        codeEditor.aceEditor.setKeyboardHandler("emacs", function() {
+          codeEditor.aceEditor.keyBinding.addKeyboardHandler(
+            ace.require("ace/keyboard/emacs").handler);
+            var occurStartCommand = ace.require("ace/commands/occur_commands").occurStartCommand;
+            codeEditor.aceEditor.commands.addCommand(occurStartCommand);
+        });
+
+        codeEditor.aceEditor.setOptions({
+          enableBasicAutocompletion: true,
+          enableLiveAutocompletion: false,
+          enableSnippets: true
+        });
+        THREE.CodeEditor.autocomplete.installDynamicJSCompleterInto(codeEditor.aceEditor);
+
+        if (false) {
+          codeEditor.aceEditor.setOption("mode", "ace/mode/html");
+          codeEditor.setValue(htmlCode);
+        } else {
+          codeEditor.aceEditor.setOption("mode", "ace/mode/javascript");
+          // The demo is inspired by http://threejs.org/examples/#webgl_geometry_hierarchy2
+          var welcomeText = 
+            "// Welcome to the CodeChisel3D demo!\n"
+            + "// -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-\n"
+            + "\n"
+            + "// You can evaluate JavaScript code in this workspace\n"
+            + "// by pressing " + (isMac ? "CMD" : "Ctrl") + "-d. Select the entire text and evaluate it!\n"
+            + "// For more information see\n"
+            + "// http://robert.kra.hn/projects/live-programming-with-three-and-webvr\n"
+            + "\n"
+            + "codeEditor.alignWithCamera(\"left\", world.camera);\n"
+            + "\n"
+            + "// create lots of boxes:\n"
+            + "var geometry = new THREE.BoxGeometry(100, 100, 100),\n"
+            + "    material = new THREE.MeshNormalMaterial(),\n"
+            + "    root = new THREE.Mesh(geometry, material),\n"
+            + "    object, parent = root;\n"
+            + "world.scene.add(root);\n"
+            + "\n"
+            + "lively.lang.arr.range(0,200).reduce(function(parent, _) {\n"
+            + "	object = new THREE.Mesh(geometry, material);\n"
+            + "	object.position.z = -100;\n"
+            + "	parent.add(object);\n"
+            + "  return object;\n"
+            + "}, root)\n"
+            + "\n"
+            + "world.addAnimationCallback(\"anim\", function() {\n"
+            + "  var time = Date.now() * 0.001,\n"
+            + "      rx = Math.sin(time * 0.2) * 0.1,\n"
+            + "      ry = Math.sin(time * 0.3) * 0.1,\n"
+            + "      rz = Math.sin(time * 0.7) * 0.2;\n"
+            + "  root.traverse(function (object) { object.rotation.set(rx, ry, rz); });\n"
+            + "});\n"
+
+          codeEditor.setSize(550, 550);
+          codeEditor.setValue(welcomeText);
+        }
+
+        if (world.orbitControl) {
+          world.orbitControl.target = codeEditor.position.clone();
+        } else world.camera.lookAt(codeEditor.position);
+
+        // For debugging
+        window.world = world;
+        window.codeEditor = codeEditor;
+      });
+    </script>
+
+
+    <script type="text/javascript" src="../lib/experiments.js"></script>
+
+<script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+  ga('create', 'UA-56965545-2', 'auto', {'siteSpeedSampleRate': 50});
+  ga('require', 'linkid', 'linkid.js');
+  ga('require', 'displayfeatures');
+  ga('send', 'pageview');
+</script>
+  </body>
+</html>
+
