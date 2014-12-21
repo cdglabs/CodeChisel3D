@@ -1,4 +1,4 @@
-![](blob/master/assets/codechisel-github-image.png?raw=true)
+<div style="text-align:center"><img src ="https://raw.githubusercontent.com/cdglabs/CodeChisel3D/master/assets/codechisel-github-image.png" /></div>
 
 A 3D live programming experiment.
 
