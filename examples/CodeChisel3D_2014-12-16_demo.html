@@ -13,13 +13,13 @@
     <script type="text/javascript" src="../vendor/mousetrap.js"></script>
 
     <!--three-->
-    <script type="text/javascript" src="http://cdnjs.cloudflare.com/ajax/libs/three.js/r69/three.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r69/three.js"></script>
     <script type="text/javascript" src="../vendor/three/OrbitControls.js"></script>
     <script type="text/javascript" src="../vendor/three/VRControls.js"></script>
     <script type="text/javascript" src="../vendor/three/VREffect.js"></script>
     <script type="text/javascript" src="../vendor/three/TransformControls.js"></script>
-    <script type="text/javascript" src="http://jeromeetienne.github.io/threex.videotexture/threex.videotexture.js"></script>
-    <script type="text/javascript" src="http://jeromeetienne.github.io/threex.videotexture/threex.webcamtexture.js"></script>
+    <script type="text/javascript" src="https://jeromeetienne.github.io/threex.videotexture/threex.videotexture.js"></script>
+    <script type="text/javascript" src="https://jeromeetienne.github.io/threex.videotexture/threex.webcamtexture.js"></script>
     <script type="text/javascript" src="https://rawgit.com/jeromeetienne/tquery/master/build/tquery.js"></script>
     <script type="text/javascript" src="../vendor/three-world-with-tquery.dev.js"></script>
 
@@ -29,7 +29,7 @@
 
 
     <!--lively-2-lively-->
-    <!--<script type="text/javascript" src="http://lively-web.org/users/robertkrahn/node-lively2lively/lively2lively-browserified.js?name=three-codeeditor-simple&baseURL=http://lively-web.org:8080&autoload=true"></script></style>-->
+    <!--<script type="text/javascript" src="https://lively-web.org/users/robertkrahn/node-lively2lively/lively2lively-browserified.js?name=three-codeeditor-simple&baseURL=https://lively-web.org:8080&autoload=true"></script></style>-->
 
     <!--scene setup-->
     <script type="text/javascript" >
@@ -102,15 +102,16 @@
           codeEditor.setValue(htmlCode);
         } else {
           codeEditor.aceEditor.setOption("mode", "ace/mode/javascript");
-          // The demo is inspired by http://threejs.org/examples/#webgl_geometry_hierarchy2
+          // The demo is inspired by https://threejs.org/examples/#webgl_geometry_hierarchy2
           var welcomeText = 
             "// Welcome to the CodeChisel3D demo!\n"
             + "// -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-\n"
             + "\n"
+            + "// Controls: Alt + left click - rotate, alt + right click - pan, mouse wheel - move along z axis\n"
             + "// You can evaluate JavaScript code in this workspace\n"
             + "// by pressing " + (isMac ? "CMD" : "Ctrl") + "-d. Select the entire text and evaluate it!\n"
             + "// For more information see\n"
-            + "// http://robert.kra.hn/projects/live-programming-with-three-and-webvr\n"
+            + "// https://robert.kra.hn/projects/live-programming-with-three-and-webvr\n"
             + "\n"
             + "codeEditor.alignWithCamera(\"left\", world.camera);\n"
             + "\n"

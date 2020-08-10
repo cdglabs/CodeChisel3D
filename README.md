@@ -2,4 +2,4 @@
 
 A 3D live programming experiment.
 
-For more info see the [project page](http://robert.kra.hn/projects/live-programming-with-three-and-webvr).
+For more info see the [project page](https://robert.kra.hn/projects/live-programming-with-three-and-webvr).
