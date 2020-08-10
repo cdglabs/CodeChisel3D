@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>Simple THREE codeeditor setup</title>
+    <meta http-equiv="cache-control" content="no-cache" />
+    <meta http-equiv="pragma" content="no-cache" />
+
+  </head>
+  <body>
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.js"></script>
+    <script src="http://lively-web.org/users/robertkrahn/just-the-core/html-console.js"></script>
+    <script type="text/javascript" src="http://lively-web.org/users/robertkrahn/node-lively2lively/lively2lively-browserified.js?name=three-codeeditor-example&baseURL=http://lively-web.org:8080&autoload=true"></script></style>
+    <script type="text/javascript" src="../vendor/three/three.js"></script>
+		<script type="text/javascript" src="three/VREffect.js"></script>
+		<script type="text/javascript" src="three/VRControls.js"></script>
+    <script type="text/javascript" src="three/OrbitControls.js"></script>
+    <script type="text/javascript" src="../vendor/three/threex.domevents.js"></script>
+    <script type="text/javascript" src="../vendor/ace/src-min-noconflict/ace.js"></script>
+    <script type="text/javascript" src="../node_modules/lively.lang/lively.lang.min.js"></script>
+    <script type="text/javascript" src="../lib/helper.js"></script>
+    <script type="text/javascript" src="../index.js"></script>
+    <script type="text/javascript" src="../lib/ace-helper.js"></script>
+    <script type="text/javascript" src="../lib/canvas2d.js"></script>
+    <script type="text/javascript" src="../lib/mouseevents.js"></script>
+    <script type="text/javascript" src="../lib/rendering.js"></script>
+
+    <input type="button" class="button" value="Start VR Mode" />
+    <script type="text/javascript" >
+
+		// 	var mouse = new THREE.Vector2(), INTERSECTED;
+		// 	var radius = 100, theta = 0;
+
+		// 	function onDocumentMouseMove( event ) {
+		// 		event.preventDefault();
+		// 		mouse.x = ( event.clientX / window.innerWidth ) * 2 - 1;
+		// 		mouse.y = - ( event.clientY / window.innerHeight ) * 2 + 1;
+		// 	}
+
+		// 	// find intersections
+		// 	var projector = new THREE.Projector();
+		// 	var raycaster = new THREE.Raycaster();
+		// 	var vector = new THREE.Vector3( mouse.x, mouse.y, 1 );
+		// 	projector.unprojectVector( vector, camera );
+		// 	raycaster.set( camera.position, vector.sub( camera.position ).normalize() );
+		// 	var intersects = raycaster.intersectObjects( scene.children );
+
+// -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+
+
+      createThreeWorld(document.body, {useVR: true}, function(err, world) {
+    
+        var THREExDOMEvents = new THREEx.DomEvents(world.camera, world.renderer.domElement);
+        var codeEditor = new THREE.CodeEditor(world.renderer.domElement, THREExDOMEvents);
+    
+        world.scene.add(codeEditor);
+        // codeEditor.position.set(0,200,0)
+        // if (world.control) {
+        //   world.control.target = codeEditor.geometry.boundingBox.center().clone();;
+        //   world.control.panUp(220);
+        //   world.control.rotateUp(-.5)
+        //   world.control.dollyOut(1.2);
+        // } else 
+        world.camera.lookAt(codeEditor.position);
+    
+        codeEditor.setValue("test\n foo bar baz!\n");
+
+        // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+
+    		var vrEffect = world.vr && world.vr.effect;
+
+  			var fullScreenButton = document.querySelector('.button');
+  			fullScreenButton.onclick = function() { vrEffect && vrEffect.setFullScreen( true ); };
+
+        // For debugging
+        window.world = world;
+        window.codeEditor = codeEditor;
+      });
+    </script>
+
+  </body>
+</html>

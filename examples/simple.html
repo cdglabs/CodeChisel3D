@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>Simple THREE codeeditor setup</title>
+    <meta http-equiv="cache-control" content="no-cache" />
+    <meta http-equiv="pragma" content="no-cache" />
+
+  </head>
+  <body style="margin:0;">
+    <!--ui related-->
+    <script type="text/javascript" src="js/dat.gui.js"></script>
+    <script type="text/javascript" src="js/mousetrap.js"></script>
+
+    <!--ace editor-->
+    <script type="text/javascript" src="../vendor/ace/src-noconflict/ace.js"></script>
+    <script type="text/javascript" src="../vendor/ace/src-noconflict/ext-language_tools.js"></script>
+    <script type="text/javascript" src="../vendor/ace/src-noconflict/keybinding-emacs.js"></script>
+
+    <!--three-->
+    <script type="text/javascript" src="../vendor/three/three.js"></script>
+    <script type="text/javascript" src="js/three/OrbitControls.js"></script>
+    <script type="text/javascript" src="js/three/VRControls.js"></script>
+    <script type="text/javascript" src="js/three/VREffect.js"></script>
+    <script type="text/javascript" src="js/three/ColladaLoader.js"></script>
+    <script type="text/javascript" src="js/three/TransformControls.js"></script>
+    <script type="text/javascript" src="../vendor/three/threex.domevents.js"></script>
+    <script type="text/javascript" src="http://jeromeetienne.github.io/threex.videotexture/threex.videotexture.js"></script>
+    <script type="text/javascript" src="http://jeromeetienne.github.io/threex.videotexture/threex.webcamtexture.js"></script>
+
+    <!--tQuery-->
+    <script type="text/javascript" src="js/three/tquery.js"></script>
+    <script type="text/javascript" src="js/three/tquery-interface.js"></script>
+
+    <!--THREE-world-->
+    <script type="text/javascript" src="js/three/world.js"></script>
+
+    <!--lively.vm-->
+    <script type="text/javascript" src="js/lively.vm.dev-bundle.js"></script>
+
+    <!--codeeditor-3d-->
+    <script type="text/javascript" src="../lib/helper.js"></script>
+    <script type="text/javascript" src="../index.js"></script>
+    <script type="text/javascript" src="../lib/commands.js"></script>
+    <script type="text/javascript" src="../lib/ace-helper.js"></script>
+    <script type="text/javascript" src="../lib/canvas2d.js"></script>
+    <script type="text/javascript" src="../lib/domevents.js"></script>
+    <script type="text/javascript" src="../lib/raycasting.js"></script>
+    <script type="text/javascript" src="../lib/mouseevents.js"></script>
+    <script type="text/javascript" src="../lib/rendering.js"></script>
+    <script type="text/javascript" src="../lib/autocomplete.js"></script>
+
+    <!--lively-2-lively-->
+    <script type="text/javascript" src="http://lively-web.org/users/robertkrahn/node-lively2lively/lively2lively-browserified.js?name=three-codeeditor-simple&baseURL=http://lively-web.org:8080&autoload=true"></script></style>
+
+    <!--scene setup-->
+    <script type="text/javascript" >
+      var htmlCode = document.documentElement.innerHTML;
+      var useVR = !!navigator.mozGetVRDevices || !!navigator.getVRDevices;
+      THREE.World.create(document.body, {useOrbitControl: true, useVR: useVR}, function(err, world) {
+
+        world.startLoop();
+        world.renderer.setClearColor(0x333F47, 1);
+        world.camera.position.set(0,200,320);
+        world.camera.far = 100000;
+        world.camera.updateProjectionMatrix();
+
+        // -=-=-=-=-=-=-=-=-=-=-=-=-=-
+        // some geometry to play with
+        // -=-=-=-=-=-=-=-=-=-=-=-=-=-
+
+        var plane = new THREE.Mesh(
+            new THREE.PlaneGeometry(1000,1000, 20,20),
+            new THREE.MeshBasicMaterial({
+              color: 0x00ffff, wireframe: true,
+              side: THREE.DoubleSide}));
+        plane.position.set(plane.position.x/2, 0, plane.position.z/2);
+        plane.rotation.x = Math.PI/2
+        world.scene.add(plane);
+
+
+        // -=-=-=-=-=-=-=-=-=-
+        // events + controls
+        // -=-=-=-=-=-=-=-=-=-
+        var DOMEvents = THREEx.DomEvents;
+        world.events = new DOMEvents(world.camera, world.renderer.domElement);
+        setupTQuery(world);
+
+        // -=-=-=-=-=-=-=-=-=-
+        // prepare code editor
+        // -=-=-=-=-=-=-=-=-=-
+
+        var codeEditor = new THREE.CodeEditor(world.renderer.domElement, world.events);
+        world.scene.add(codeEditor);
+        codeEditor.position.set(0,200,0)
+
+        codeEditor.aceEditor.keyBinding.addKeyboardHandler(ace.require("ace/keyboard/emacs").handler);
+        codeEditor.aceEditor.setOptions({
+          enableBasicAutocompletion: true,
+          enableLiveAutocompletion: false,
+          enableSnippets: true
+        });
+        THREE.CodeEditor.autocomplete.installDynamicJSCompleterInto(codeEditor.aceEditor);
+
+        if (false) {
+          codeEditor.aceEditor.setOption("mode", "ace/mode/html");
+          codeEditor.setValue(htmlCode);
+        } else {
+          codeEditor.aceEditor.setOption("mode", "ace/mode/javascript");
+          codeEditor.setValue("1 + 2");
+        }
+
+        if (world.orbitControl) {
+          world.orbitControl.target = codeEditor.position.clone();
+        } else world.camera.lookAt(codeEditor.position);
+
+        // For debugging
+        window.world = world;
+        window.codeEditor = codeEditor;
+      });
+    </script>
+
+
+    <script type="text/javascript" src="../lib/experiments.js"></script>
+  </body>
+</html>
+
